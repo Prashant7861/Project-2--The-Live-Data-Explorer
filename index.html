@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinematic - Movie Explorer & Finnish Cinemas</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 3D Background Animation -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Animated gradient orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-content">
+                <h1 class="title-3d" data-text="CINEMATIC">
+                    <span class="title-layer">CINEMATIC</span>
+                    <span class="title-layer">CINEMATIC</span>
+                    <span class="title-layer">CINEMATIC</span>
+                </h1>
+                <p class="subtitle">Discover movies in a new dimension</p>
+            </div>
+        </header>
+
+        <!-- Mode Switcher -->
+        <div class="mode-switcher">
+            <button class="mode-btn active" data-mode="search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <span>Search Movies</span>
+            </button>
+            <button class="mode-btn" data-mode="finnkino">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span>Finnish Cinemas</span>
+                <span class="mode-badge">Finnkino</span>
+            </button>
+        </div>
+
+        <!-- OMDB Search Section -->
+        <section class="search-section" id="omdb-section">
+            <div class="search-container">
+                <div class="search-box">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input
+                        type="text"
+                        id="search-input"
+                        placeholder="Search for movies, series, or actors..."
+                        autocomplete="off"
+                    >
+                    <button id="search-btn" class="search-btn">
+                        <span>Search</span>
+                        <div class="btn-particles"></div>
+                    </button>
+                </div>
+
+                <!-- Filter Chips -->
+                <div class="filter-chips">
+                    <button class="chip active" data-type="all">
+                        <span class="chip-glow"></span>
+                        All
+                    </button>
+                    <button class="chip" data-type="movie">
+                        <span class="chip-glow"></span>
+                        Movies
+                    </button>
+                    <button class="chip" data-type="series">
+                        <span class="chip-glow"></span>
+                        Series
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Finnkino Section -->
+        <section class="search-section finnkino-section" id="finnkino-section" style="display: none;">
+            <div class="search-container">
+                <div class="finnkino-controls">
+                    <div class="finnkino-select-wrapper">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        <select id="theatre-select" class="theatre-select">
+                            <option value="">Loading theatres...</option>
+                        </select>
+                    </div>
+                    <div class="finnkino-select-wrapper">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                        </svg>
+                        <input type="date" id="date-picker" class="date-picker">
+                    </div>
+                    <button id="load-showtimes-btn" class="search-btn finnkino-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="16" height="16">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                        <span>Load Showtimes</span>
+                    </button>
+                </div>
+                <p class="finnkino-hint">Select a theatre area and date to see what's playing</p>
+            </div>
+        </section>
+
+        <!-- Loading Spinner -->
+        <div class="loading-container" id="loading" style="display: none;">
+            <div class="spinner-3d">
+                <div class="cube">
+                    <div class="face front"></div>
+                    <div class="face back"></div>
+                    <div class="face right"></div>
+                    <div class="face left"></div>
+                    <div class="face top"></div>
+                    <div class="face bottom"></div>
+                </div>
+            </div>
+            <p class="loading-text" id="loading-text">Searching the multiverse...</p>
+        </div>
+
+        <!-- Results Header -->
+        <div class="results-header" id="results-header" style="display: none;">
+            <span id="results-count"></span>
+        </div>
+
+        <!-- Results Grid -->
+        <section class="results-section" id="results-section">
+            <div class="results-grid" id="results-grid"></div>
+        </section>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="empty-state" style="display: none;">
+            <div class="empty-icon">🎬</div>
+            <h3>No results found</h3>
+            <p>Try searching for something else</p>
+        </div>
+    </div>
+
+    <!-- Movie Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <button class="modal-close" id="modal-close">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="modal-content" id="modal-content"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
