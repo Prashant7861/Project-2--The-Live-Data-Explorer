@@ -1,5 +1,5 @@
 // ==================== API CONFIGURATION ====================
-const OMDB_API_KEY = '4d1be897';
+const OMDB_API_KEY = window.CINEMATIC_CONFIG?.OMDB_API_KEY || '';
 const OMDB_BASE_URL = 'https://www.omdbapi.com/';
 const FINNKINO_BASE_URL = 'https://www.finnkino.fi/xml/'; // blocked by Cloudflare in browsers — see mock data below
 
@@ -245,6 +245,11 @@ animateBackground();
 
 // ==================== OMDB SEARCH ====================
 async function searchMovies(query, type = 'all') {
+    if (!OMDB_API_KEY) {
+        showError('OMDb API key is missing. Create config.js from config.example.js and add your key.');
+        return;
+    }
+
     const cacheKey = `omdb_${query}_${type}`;
     if (searchCache.has(cacheKey)) {
         displayResults(searchCache.get(cacheKey));
@@ -294,6 +299,8 @@ async function getMovieDetails(imdbID) {
 
 // Fetch real OMDB posters for mock movies so images always load
 async function enrichMockPosters() {
+    if (!OMDB_API_KEY) return;
+
     await Promise.all(MOCK_MOVIES.map(async movie => {
         try {
             const res = await fetch(
@@ -612,7 +619,7 @@ function hideResultsHeader() { resultsHeader.style.display = 'none'; }
 function showError(message) {
     emptyState.querySelector('h3').textContent = 'Oops!';
     emptyState.querySelector('p').textContent = message;
-    showEmptyState();
+    emptyState.style.display = 'block';
 }
 
 function closeModal() {
